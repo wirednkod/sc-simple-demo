@@ -1,5 +1,5 @@
-# sc-simple-demo
-Substrate Connect Simple demo
+# Substrate Connect Simple Demo
+This is a Substrate Connect simple browser demo that connects through SmoldotProvider or Extension Provider (more info [here](https://github.com/paritytech/substrate-connect) or [here](https://paritytech.github.io/substrate-connect/))
 
 ## Getting Started
 
@@ -27,4 +27,4 @@ yarn build
 yarn run dev
 ```
 
-DISCLAIMER: This is not entirely my work. This demo was taken from `https://github.com/paritytech/substrate-connect` after it was removed from the repo and is maintened from me for demo purposes only
+DISCLAIMER: This is not entirely my work. This demo was taken from [paritytech/substrate-connect](https://github.com/paritytech/substrate-connect) after it was removed from the repo and is maintened from me for demo purposes only
