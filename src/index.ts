@@ -4,8 +4,9 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import "regenerator-runtime/runtime"
-import { Detector } from '@substrate/connect';
+import { ScProvider, SupportedChains } from '@substrate/connect'
 import UI, { emojis } from "./view"
+import { ApiPromise } from "@polkadot/api"
 
 window.onload = () => {
   const loadTime = performance.now()
@@ -13,8 +14,8 @@ window.onload = () => {
   ui.showSyncing()
   void (async () => {
     try {
-      const app = new Detector('burnr-wallet');
-      const api = await app.connect('westend');
+      const westendProvider = new ScProvider(SupportedChains.westend);
+      const api = await ApiPromise.create({ provider: westendProvider });
 
       const header = await api.rpc.chain.getHeader()
       const chainName = await api.rpc.system.chain()
