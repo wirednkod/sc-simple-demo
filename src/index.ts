@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import "regenerator-runtime/runtime"
-import { ScProvider, SupportedChains } from '@substrate/connect'
+import { createScClient, WellKnownChains } from "@substrate/connect"
 import UI, { emojis } from "./view"
 import { ApiPromise } from "@polkadot/api"
 
@@ -14,7 +14,9 @@ window.onload = () => {
   ui.showSyncing()
   void (async () => {
     try {
-      const westendProvider = new ScProvider(SupportedChains.westend);
+      const scClient = createScClient()
+
+      const westendProvider = await scClient.addWellKnownChain(WellKnownChains.westend2);
       const api = await ApiPromise.create({ provider: westendProvider });
 
       const header = await api.rpc.chain.getHeader()
