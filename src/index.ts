@@ -4,7 +4,8 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import "regenerator-runtime/runtime"
-import { Detector } from '@substrate/connect';
+import { createPolkadotJsScClient, WellKnownChain } from "@substrate/connect"
+import { ApiPromise } from "@polkadot/api"
 import UI, { emojis } from "./view"
 
 window.onload = () => {
@@ -13,8 +14,9 @@ window.onload = () => {
   ui.showSyncing()
   void (async () => {
     try {
-      const app = new Detector('burnr-wallet');
-      const api = await app.connect('westend');
+      const scClient = createPolkadotJsScClient()
+      const provider = await scClient.addWellKnownChain(WellKnownChain.westend2)
+      const api = await ApiPromise.create({ provider })
 
       const header = await api.rpc.chain.getHeader()
       const chainName = await api.rpc.system.chain()
@@ -26,11 +28,6 @@ window.onload = () => {
       )
       ui.log(
         `${emojis.chequeredFlag} Genesis hash is ${api.genesisHash.toHex()}`,
-      )
-      ui.log(
-        `${
-          emojis.clock
-        } Epoch duration is ${api.consts.babe.epochDuration.toNumber()} blocks`,
       )
       ui.log(
         `${
