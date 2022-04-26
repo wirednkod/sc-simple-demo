@@ -27,4 +27,4 @@ yarn build
 yarn run dev
 ```
 
-DISCLAIMER: This is not entirely my work. This demo was taken from [paritytech/substrate-connect](https://github.com/paritytech/substrate-connect) after it was removed from the repo and is maintened from me for demo purposes only
+DISCLAIMER: This is not entirely my work. This demo was taken from [paritytech/substrate-connect](https://github.com/paritytech/substrate-connect) after it was removed from the repo and is maintened by me for demo purposes only

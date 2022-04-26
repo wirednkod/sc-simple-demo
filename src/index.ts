@@ -4,8 +4,11 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import "regenerator-runtime/runtime"
-import { ScProvider, SupportedChains } from '@substrate/connect'
 import UI, { emojis } from "./view"
+import {
+  ScProvider,
+  WellKnownChain,
+} from "@polkadot/rpc-provider/substrate-connect"
 import { ApiPromise } from "@polkadot/api"
 
 window.onload = () => {
@@ -14,8 +17,9 @@ window.onload = () => {
   ui.showSyncing()
   void (async () => {
     try {
-      const westendProvider = new ScProvider(SupportedChains.westend);
-      const api = await ApiPromise.create({ provider: westendProvider });
+      const provider = new ScProvider(WellKnownChain.westend2)
+      await provider.connect()
+      const api = await ApiPromise.create({ provider })
 
       const header = await api.rpc.chain.getHeader()
       const chainName = await api.rpc.system.chain()
@@ -27,11 +31,6 @@ window.onload = () => {
       )
       ui.log(
         `${emojis.chequeredFlag} Genesis hash is ${api.genesisHash.toHex()}`,
-      )
-      ui.log(
-        `${
-          emojis.clock
-        } Epoch duration is ${api.consts.babe.epochDuration.toNumber()} blocks`,
       )
       ui.log(
         `${
