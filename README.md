@@ -1,6 +1,8 @@
 # Substrate Connect Simple Demo
 This is a Substrate Connect simple browser demo that connects through SmoldotProvider or Extension Provider (more info [here](https://github.com/paritytech/substrate-connect) or [here](https://paritytech.github.io/substrate-connect/)) to `Westend` chain, retrieves (and shows) info and the latest headers from the chain.
 
+### Demo: https://wirednkod.github.io/sc-simple-demo/
+
 ## Getting Started
 
 1. Clone the whole repository.
