@@ -2,7 +2,7 @@
   "name": "@substrate/smoldot-browser-demo",
   "version": "1.0.0",
   "author": "Parity Team <admin@parity.io>",
-  "homepage": "https://wirednkod.github.io/smoldot-browser-demo/",
+  "homepage": "https://wirednkod.github.io/sc-simple-demo/",
   "contributors": [
     "Nikolaos Kontakis <nikolaos@parity.io>"
   ],
