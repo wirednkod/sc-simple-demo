@@ -2,6 +2,7 @@
   "name": "@substrate/smoldot-browser-demo",
   "version": "1.0.0",
   "author": "Parity Team <admin@parity.io>",
+  "homepage": "https://wirednkod.github.io/smoldot-browser-demo/",
   "contributors": [
     "Nikolaos Kontakis <nikolaos@parity.io>"
   ],
@@ -10,6 +11,8 @@
     "last 2 versions"
   ],
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "deep-clean": "yarn clean && rm -rf node_modules",
     "clean": "rm -rf dist/ tsconfig.tsbuildinfo && mkdir -p dist/assets",
     "typecheck": "tsc -b",
@@ -26,6 +29,7 @@
     "babel-loader": "^8.2.4",
     "concurrently": "^7.1.0",
     "crypto-browserify": "^3.12.0",
+    "gh-pages": "^3.2.3",
     "html-webpack-plugin": "^5.5.0",
     "regenerator-runtime": "^0.13.9",
     "stream-browserify": "^3.0.0",
