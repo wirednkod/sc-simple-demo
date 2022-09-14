@@ -9,11 +9,14 @@ import {
   ScProvider,
   WellKnownChain,
 } from "@polkadot/rpc-provider/substrate-connect"
-import { ApiPromise } from "@polkadot/api"
+import { ApiPromise, WsProvider } from "@polkadot/api"
 
 window.onload = () => {
   const loadTime = performance.now()
   const ui = new UI({ containerId: "messages" }, { loadTime })
+  const pjsUi = new UI({ containerId: "pjsMessages" }, { loadTime })
+  
+  pjsUi.showSyncing()
   ui.showSyncing()
   void (async () => {
     try {
@@ -23,6 +26,10 @@ window.onload = () => {
 
       const header = await api.rpc.chain.getHeader()
       const chainName = await api.rpc.system.chain()
+      
+      const pjsProvider = new WsProvider("wss://westend-rpc.polkadot.io")
+      const pjsApi = await ApiPromise.create({ provider: pjsProvider })
+      const pjsHeader = await pjsApi.rpc.chain.getHeader()
 
       // Show chain constants - from chain spec
       ui.log(`${emojis.seedling} Light client ready`, true)
@@ -55,6 +62,7 @@ window.onload = () => {
         })
       const waitForChainToSync = async () => {
         const health = await api.rpc.system.health()
+        const pjsHealth = await pjsApi.rpc.system.health()
         if (health.isSyncing.eq(false)) {
           ui.showSynced()
         } else {
@@ -62,10 +70,26 @@ window.onload = () => {
           await wait(2000)
           await waitForChainToSync()
         }
+
+        if (pjsHealth.isSyncing.eq(false)) {
+          pjsUi.showSynced()
+        } else {
+          pjsUi.showSyncing()
+          await wait(2000)
+          await waitForChainToSync()
+        }
       }
 
       await waitForChainToSync()
       ui.log(`${emojis.newspaper} Subscribing to new block headers`)
+      await pjsApi.rpc.chain.subscribeNewHeads(
+        (pjslastHeader: { number: unknown; hash: unknown }) => {
+          pjsUi.log(
+            `${emojis.brick} - PJS - New block #${pjslastHeader.number} has hash ${pjslastHeader.hash}`,
+          )
+        },
+      )
+
       await api.rpc.chain.subscribeNewHeads(
         (lastHeader: { number: unknown; hash: unknown }) => {
           ui.log(
