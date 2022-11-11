@@ -13,6 +13,7 @@ window.onload = () => {
     ui.showSyncing();
     void (async () => {
         try {
+            // const provider = new WsProvider("wss://rpc.polkadot.io")
             const provider = new ScProvider(WellKnownChain.westend2);
             await provider.connect();
             const api = await ApiPromise.create({ provider });
