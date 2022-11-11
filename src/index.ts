@@ -9,7 +9,7 @@ import {
   ScProvider,
   WellKnownChain,
 } from "@polkadot/rpc-provider/substrate-connect"
-import { ApiPromise } from "@polkadot/api"
+import { ApiPromise,  WsProvider } from "@polkadot/api"
 
 window.onload = () => {
   const loadTime = performance.now()
@@ -17,8 +17,12 @@ window.onload = () => {
   ui.showSyncing()
   void (async () => {
     try {
+
+
+      // const provider = new WsProvider("wss://rpc.polkadot.io")
       const provider = new ScProvider(WellKnownChain.westend2)
       await provider.connect()
+
       const api = await ApiPromise.create({ provider })
 
       const header = await api.rpc.chain.getHeader()
