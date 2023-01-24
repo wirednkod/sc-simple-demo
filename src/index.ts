@@ -5,11 +5,10 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import "regenerator-runtime/runtime"
 import UI, { emojis } from "./view"
-import {
-  ScProvider,
-  WellKnownChain,
-} from "@polkadot/rpc-provider/substrate-connect"
+
 import { ApiPromise } from "@polkadot/api"
+import { ScProvider } from "@polkadot/rpc-provider/substrate-connect"
+import * as Sc from '@substrate/connect';
 
 window.onload = () => {
   const loadTime = performance.now()
@@ -17,10 +16,14 @@ window.onload = () => {
   ui.showSyncing()
   void (async () => {
     try {
-      const provider = new ScProvider(WellKnownChain.westend2)
+
+
+      const provider = new ScProvider(Sc, Sc.WellKnownChain.westend2)
       await provider.connect()
       const api = await ApiPromise.create({ provider })
 
+
+      
       const header = await api.rpc.chain.getHeader()
       const chainName = await api.rpc.system.chain()
 
