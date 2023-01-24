@@ -20,6 +20,7 @@ window.onload = () => {
 
       const provider = new ScProvider(Sc, Sc.WellKnownChain.westend2)
       await provider.connect()
+
       const api = await ApiPromise.create({ provider })
 
 
