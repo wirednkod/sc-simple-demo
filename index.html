@@ -42,9 +42,33 @@
         animation-iteration-count: infinite;
         animation-timing-function: linear;
       }
+      .split {
+        height: 100%;
+        width: 50%;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        overflow-x: hidden;
+        padding-top: 20px;
+      }
+
+      /* Control the left side */
+      .left {
+        left: 0;
+        background-color: #111;
+      }
+
+      /* Control the right side */
+      .right {
+        right: 0;
+        background-color: red;
+      }
+
     </style>
-    <section id="messages"></section>
-    <section id="pjsMessages"></section>
+    <div className="split">
+      <section className="split left" id="messages"></section>
+      <section className="split right" id="pjsMessages"></section>
+    </div>
     <script type="module" src="./src/index.ts"></script>
   </body>
 </html>

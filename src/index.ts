@@ -5,11 +5,14 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import "regenerator-runtime/runtime"
 import UI, { emojis } from "./view"
-import {
-  ScProvider,
-  WellKnownChain,
-} from "@polkadot/rpc-provider/substrate-connect"
+
+/** Normal Way **/
 import { ApiPromise, WsProvider } from "@polkadot/api"
+
+/** "Magic" Way **/
+import { ScProvider } from "@polkadot/rpc-provider/substrate-connect"
+import * as Sc from '@substrate/connect';
+
 
 window.onload = () => {
   const loadTime = performance.now()
@@ -20,16 +23,20 @@ window.onload = () => {
   ui.showSyncing()
   void (async () => {
     try {
-      const provider = new ScProvider(WellKnownChain.westend2)
+      
+      /** Normal Way **/
+      const pjsProvider = new WsProvider("wss://westend-rpc.polkadot.io")
+      const pjsApi = await ApiPromise.create({ provider: pjsProvider })
+      
+      /** "Magic" Way **/
+      const provider = new ScProvider(Sc, Sc.WellKnownChain.westend2)
       await provider.connect()
       const api = await ApiPromise.create({ provider })
 
+
+      // REST
       const header = await api.rpc.chain.getHeader()
       const chainName = await api.rpc.system.chain()
-      
-      const pjsProvider = new WsProvider("wss://westend-rpc.polkadot.io")
-      const pjsApi = await ApiPromise.create({ provider: pjsProvider })
-      const pjsHeader = await pjsApi.rpc.chain.getHeader()
 
       // Show chain constants - from chain spec
       ui.log(`${emojis.seedling} Light client ready`, true)

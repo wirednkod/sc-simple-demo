@@ -1,0 +1,72 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+import "regenerator-runtime/runtime"
+import UI, { emojis } from "./view"
+import {
+  ScProvider,
+  WellKnownChain,
+} from "@polkadot/rpc-provider/substrate-connect"
+import { ApiPromise, WsProvider } from "@polkadot/api"
+
+window.onload = () => {
+  const loadTime = performance.now()
+  const ui = new UI({ containerId: "messages" }, { loadTime })
+  const pjsUi = new UI({ containerId: "pjsMessages" }, { loadTime })
+  
+  pjsUi.showSyncing()
+  ui.showSyncing()
+  void (async () => {
+    try {
+      // const provider = new ScProvider(WellKnownChain.polkadot)
+
+      // await provider.connect({ embeddedNodeConfig: { maxLogLevel: 4 }  })
+      // const api = await ApiPromise.create({ provider })
+
+      // const validators = await api.query.staking.validators.entries();
+      
+      const pjsProvider = new WsProvider("wss://rpc.polkadot.io")
+      const pjsApi = await ApiPromise.create({ provider: pjsProvider })
+      const pjsValidators = await pjsApi.query.staking.validators.entries();
+
+      // Show chain constants - from chain spec
+      ui.log(`${emojis.seedling} Light client ready`, true)
+      // ui.log(
+      //   `${emojis.info} Connected to: validators ${validators}`,
+      // )
+
+      const wait = (ms: number) =>
+        new Promise<void>((res) => {
+          setTimeout(res, ms)
+        })
+      const waitForChainToSync = async () => {
+        // const health = await api.rpc.system.health()
+        // if (health.isSyncing.eq(false)) {
+        //   ui.showSynced()
+        // } else {
+        //   ui.showSyncing()
+        //   await wait(2000)
+        //   await waitForChainToSync()
+        // }
+
+        const pjsHealth = await pjsApi.rpc.system.health()
+        if (pjsHealth.isSyncing.eq(false)) {
+          pjsUi.showSynced()
+        } else {
+          pjsUi.showSyncing()
+          await wait(2000)
+          await waitForChainToSync()
+        }
+      }
+
+      await waitForChainToSync()
+      pjsUi.log(
+        `${emojis.brick} - PJS - New block has hash ${pjsValidators}`,
+      )
+    } catch (error) {
+      ui.error(<Error>error)
+    }
+  })()
+}
