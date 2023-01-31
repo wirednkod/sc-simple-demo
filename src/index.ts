@@ -8,7 +8,7 @@ import UI, { emojis } from "./view"
 
 import { ApiPromise } from "@polkadot/api"
 import { ScProvider } from "@polkadot/rpc-provider/substrate-connect"
-import * as Sc from '@substrate/connect';
+import * as Sc from "@substrate/connect"
 
 window.onload = () => {
   const loadTime = performance.now()
@@ -17,10 +17,10 @@ window.onload = () => {
   void (async () => {
     try {
 
-
+      
+      
       const provider = new ScProvider(Sc, Sc.WellKnownChain.westend2)
-      await provider.connect()
-
+      await provider.connect();
       const api = await ApiPromise.create({ provider })
 
 
@@ -29,7 +29,7 @@ window.onload = () => {
       const chainName = await api.rpc.system.chain()
 
       // Show chain constants - from chain spec
-      ui.log(`${emojis.seedling} Light client ready`, true)
+      ui.log(`${emojis.seedling} client ready`, true)
       ui.log(
         `${emojis.info} Connected to ${chainName}: syncing will start at block #${header.number}`,
       )
