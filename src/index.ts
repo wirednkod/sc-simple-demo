@@ -25,11 +25,13 @@ window.onload = () => {
 
       const api = await ApiPromise.create({ provider })
 
+
+      
       const header = await api.rpc.chain.getHeader()
       const chainName = await api.rpc.system.chain()
 
       // Show chain constants - from chain spec
-      ui.log(`${emojis.seedling} Light client ready`, true)
+      ui.log(`${emojis.seedling} client ready`, true)
       ui.log(
         `${emojis.info} Connected to ${chainName}: syncing will start at block #${header.number}`,
       )
