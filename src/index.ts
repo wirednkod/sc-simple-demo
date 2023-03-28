@@ -7,8 +7,8 @@ import "regenerator-runtime/runtime"
 import UI, { emojis } from "./view"
 import {
   ScProvider,
-  WellKnownChain,
-} from "@polkadot/rpc-provider/substrate-connect"
+} from "@polkadot/rpc-provider"
+import * as Sc from "@substrate/connect"
 import { ApiPromise,  WsProvider } from "@polkadot/api"
 
 window.onload = () => {
@@ -20,7 +20,7 @@ window.onload = () => {
 
 
       // const provider = new WsProvider("wss://rpc.polkadot.io")
-      const provider = new ScProvider(WellKnownChain.westend2)
+      const provider = new ScProvider( Sc, Sc.WellKnownChain.westend2)
       await provider.connect()
 
       const api = await ApiPromise.create({ provider })
