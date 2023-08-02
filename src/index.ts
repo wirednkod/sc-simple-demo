@@ -3,84 +3,149 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import "regenerator-runtime/runtime"
-import UI, { emojis } from "./view"
-import {
-  ScProvider,
-} from "@polkadot/rpc-provider"
-import * as Sc from "@substrate/connect"
-import { ApiPromise,  WsProvider } from "@polkadot/api"
+import "regenerator-runtime/runtime";
+import UI, { emojis } from "./view";
+import UIPJS from "./view_pjs";
+import { ScProvider } from "@polkadot/rpc-provider";
+import * as Sc from "@substrate/connect";
+import { ApiPromise, WsProvider } from "@polkadot/api";
 
 window.onload = () => {
-  const loadTime = performance.now()
-  const ui = new UI({ containerId: "messages" }, { loadTime })
-  ui.showSyncing()
+  const loadTime = performance.now();
+  const ui = new UI({ containerId: "messages" }, { loadTime });
+  ui.showSyncing();
   void (async () => {
     try {
+      // CONNECT TO LIGHT CLIENT
+      const provider = new ScProvider(Sc, Sc.WellKnownChain.westend2);
+      await provider.connect();
+      const api = await ApiPromise.create({ provider });
+      {
+        const header = await api.rpc.chain.getHeader();
+        const chainName = await api.rpc.system.chain();
 
+        // Show chain constants - from chain spec
+        ui.log(`${emojis.seedling} client ready`, true);
+        ui.log(
+          `${emojis.info} Connected to ${chainName}: syncing will start at block #${header.number}`
+        );
+        ui.log(
+          `${emojis.chequeredFlag} Genesis hash is ${api.genesisHash.toHex()}`
+        );
+        ui.log(
+          `${
+            emojis.banknote
+          } ExistentialDeposit is ${api.consts.balances.existentialDeposit.toHuman()}`
+        );
 
-      // const provider = new WsProvider("wss://rpc.polkadot.io")
-      const provider = new ScProvider( Sc, Sc.WellKnownChain.westend2)
-      await provider.connect()
+        // Show how many peers we are syncing with
+        const health = await api.rpc.system.health();
+        const peers =
+          health.peers.toNumber() === 1 ? "1 peer" : `${health.peers} peers`;
+        ui.log(`${emojis.stethoscope} Chain is syncing with ${peers}`);
 
-      const api = await ApiPromise.create({ provider })
+        // Check the state of syncing every 2s and update the syncing state message
+        //
+        // Resolves the first time the chain is fully synced so we can wait before
+        // adding subscriptions. Carries on pinging to keep the UI consistent
+        // in case syncing stops or starts.
+        const wait = (ms: number) =>
+          new Promise<void>((res) => {
+            setTimeout(res, ms);
+          });
+        const waitForChainToSync = async () => {
+          const health = await api.rpc.system.health();
+          if (health.isSyncing.eq(false)) {
+            ui.showSynced();
+          } else {
+            ui.showSyncing();
+            await wait(2000);
+            await waitForChainToSync();
+          }
+        };
 
-
-      
-      const header = await api.rpc.chain.getHeader()
-      const chainName = await api.rpc.system.chain()
-
-      // Show chain constants - from chain spec
-      ui.log(`${emojis.seedling} client ready`, true)
-      ui.log(
-        `${emojis.info} Connected to ${chainName}: syncing will start at block #${header.number}`,
-      )
-      ui.log(
-        `${emojis.chequeredFlag} Genesis hash is ${api.genesisHash.toHex()}`,
-      )
-      ui.log(
-        `${
-          emojis.banknote
-        } ExistentialDeposit is ${api.consts.balances.existentialDeposit.toHuman()}`,
-      )
-
-      // Show how many peers we are syncing with
-      const health = await api.rpc.system.health()
-      const peers =
-        health.peers.toNumber() === 1 ? "1 peer" : `${health.peers} peers`
-      ui.log(`${emojis.stethoscope} Chain is syncing with ${peers}`)
-
-      // Check the state of syncing every 2s and update the syncing state message
-      //
-      // Resolves the first time the chain is fully synced so we can wait before
-      // adding subscriptions. Carries on pinging to keep the UI consistent
-      // in case syncing stops or starts.
-      const wait = (ms: number) =>
-        new Promise<void>((res) => {
-          setTimeout(res, ms)
-        })
-      const waitForChainToSync = async () => {
-        const health = await api.rpc.system.health()
-        if (health.isSyncing.eq(false)) {
-          ui.showSynced()
-        } else {
-          ui.showSyncing()
-          await wait(2000)
-          await waitForChainToSync()
-        }
+        await waitForChainToSync();
+        ui.log(`${emojis.newspaper} Subscribing to new block headers`);
+        await api.rpc.chain.subscribeNewHeads(
+          (lastHeader: { number: unknown; hash: unknown }) => {
+            ui.log(
+              `${emojis.brick} New block #${lastHeader.number} has hash ${lastHeader.hash}`
+            );
+          }
+        );
       }
-
-      await waitForChainToSync()
-      ui.log(`${emojis.newspaper} Subscribing to new block headers`)
-      await api.rpc.chain.subscribeNewHeads(
-        (lastHeader: { number: unknown; hash: unknown }) => {
-          ui.log(
-            `${emojis.brick} New block #${lastHeader.number} has hash ${lastHeader.hash}`,
-          )
-        },
-      )
     } catch (error) {
-      ui.error(<Error>error)
+      ui.error(<Error>error);
     }
-  })()
-}
+  })();
+
+  const loadTime_pjs = performance.now();
+  const ui_pjs = new UIPJS(
+    { containerId: "messages_pjs" },
+    { loadTime: loadTime_pjs }
+  );
+  ui_pjs.showSyncing();
+  void (async () => {
+    try {
+      // CONNECT TO URL
+      const provider = new WsProvider("wss://westend-rpc.polkadot.io");
+      const api = await ApiPromise.create({ provider });
+      {
+        const header = await api.rpc.chain.getHeader();
+        const chainName = await api.rpc.system.chain();
+
+        // Show chain constants - from chain spec
+        ui_pjs.log(`${emojis.seedling} client ready`, true);
+        ui_pjs.log(
+          `${emojis.info} Connected to ${chainName}: syncing will start at block #${header.number}`
+        );
+        ui_pjs.log(
+          `${emojis.chequeredFlag} Genesis hash is ${api.genesisHash.toHex()}`
+        );
+        ui_pjs.log(
+          `${
+            emojis.banknote
+          } ExistentialDeposit is ${api.consts.balances.existentialDeposit.toHuman()}`
+        );
+
+        // Show how many peers we are syncing with
+        const health = await api.rpc.system.health();
+        const peers =
+          health.peers.toNumber() === 1 ? "1 peer" : `${health.peers} peers`;
+        ui_pjs.log(`${emojis.stethoscope} Chain is syncing with ${peers}`);
+
+        // Check the state of syncing every 2s and update the syncing state message
+        //
+        // Resolves the first time the chain is fully synced so we can wait before
+        // adding subscriptions. Carries on pinging to keep the UI consistent
+        // in case syncing stops or starts.
+        const wait = (ms: number) =>
+          new Promise<void>((res) => {
+            setTimeout(res, ms);
+          });
+        const waitForChainToSync = async () => {
+          const health = await api.rpc.system.health();
+          if (health.isSyncing.eq(false)) {
+            ui_pjs.showSynced();
+          } else {
+            ui_pjs.showSyncing();
+            await wait(2000);
+            await waitForChainToSync();
+          }
+        };
+
+        await waitForChainToSync();
+        ui_pjs.log(`${emojis.newspaper} Subscribing to new block headers`);
+        await api.rpc.chain.subscribeNewHeads(
+          (lastHeader: { number: unknown; hash: unknown }) => {
+            ui_pjs.log(
+              `${emojis.brick} New block #${lastHeader.number} has hash ${lastHeader.hash}`
+            );
+          }
+        );
+      }
+    } catch (error) {
+      ui_pjs.error(<Error>error);
+    }
+  })();
+};

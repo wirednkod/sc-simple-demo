@@ -3,12 +3,25 @@
     <div id="root"></div>
     <style>
       body {
+        background: #000;
         margin: 0;
         font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
           monospace;
         font-size: 14px;
       }
+      #splitter {
+        display: flex;
+      }
+      #splitted {
+        width: 50%;
+      }
       #messages {
+        background-color: black;
+        margin: 0 auto;
+        color: #18ffb2;
+        padding: 0.5rem;
+      }
+      #messages_pjs {
         background-color: black;
         margin: 0 auto;
         color: #18ffb2;
@@ -43,7 +56,14 @@
         animation-timing-function: linear;
       }
     </style>
-    <section id="messages"></section>
+    <div id="splitter">
+      <div id="splitted">
+        <section id="messages"></section>
+      </div>
+      <div id="splitted">
+        <section id="messages_pjs"></section>
+      </div>
+    </div>
     <script type="module" src="./src/index.ts"></script>
   </body>
 </html>
