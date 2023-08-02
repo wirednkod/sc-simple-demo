@@ -19,7 +19,7 @@ export const emojis = {
   tick: "✅",
 };
 
-export default class UI {
+export default class UIPJS {
   private options: Options;
   private model: Model;
   private container: HTMLElement;
@@ -133,6 +133,6 @@ export default class UI {
     }
 
     this.syncMessage.classList.remove("pulse");
-    this.syncMessage.innerHTML = `${emojis.tick} Chain synced! - Light Client`;
+    this.syncMessage.innerHTML = `${emojis.tick} Chain synced! - PolkadotJS API`;
   };
 }
