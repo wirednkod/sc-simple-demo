@@ -7,6 +7,8 @@ import { getSmProvider } from "polkadot-api/sm-provider";
 import { chainSpec } from "polkadot-api/chains/polkadot";
 import { start } from "polkadot-api/smoldot";
 
+const { name } = JSON.parse(chainSpec)
+
 window.onload = () => {
   const loadTime = performance.now()
   const ui = new UI({ containerId: "messages" }, { loadTime })
@@ -23,38 +25,28 @@ window.onload = () => {
       // To interact with the chain, you need to get the `TypedApi`, which includes
       // all the types for every call in that chain:
       const dotApi = client.getTypedApi(dot);
-
-      console.log("-- ",);
-
-      // const header = await api.rpc.chain.getHeader()
-      // const chainName = await api.rpc.system.chain()
+      const runtime = await dotApi.runtime.latest()
+      const latestHeader = await client.getBlockHeader()
 
       // // Show chain constants - from chain spec
       ui.log(`${emojis.seedling} client ready`, true)
-      // ui.log(
-      //   `${emojis.info} Connected to ${chainName}: syncing will start at block #${header.number}`,
-      // )
+      ui.log(
+        `${emojis.info} Connected to ${name}: syncing will start at block #${latestHeader.number}`,
+      )
+
       // ui.log(
       //   `${emojis.chequeredFlag} Genesis hash is ${api.genesisHash.toHex()}`,
       // )
       ui.log(
         `${emojis.banknote
-        } ExistentialDeposit is ${dotApi.constants.Balances.ExistentialDeposit.toString()}`,
+        } ExistentialDeposit is ${dotApi.constants.Balances.ExistentialDeposit(runtime)}`
       )
-
-
-      // Show how many peers we are syncing with
-      // const health = await api.rpc.system.health()
-      // const peers =
-      //   health.peers.toNumber() === 1 ? "1 peer" : `${health.peers} peers`
-
-      // ui.log(`${emojis.stethoscope} Chain is syncing with ${peers}`)
 
       ui.log(`${emojis.newspaper} Subscribing to new block headers`)
       client.finalizedBlock$.subscribe((finalizedBlock: { number: any; hash: any; }) => {
         ui.showSynced()
         ui.log(
-          `${emojis.brick} New block #${finalizedBlock.number} has hash ${finalizedBlock.hash}`,
+          `${emojis.brick} New block #${finalizedBlock.number} has hash ${finalizedBlock.hash} `,
         )
       }
       );
