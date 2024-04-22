@@ -20,7 +20,7 @@ window.onload = () => {
 
 
       // const provider = new WsProvider("wss://rpc.polkadot.io")
-      const provider = new ScProvider( Sc, Sc.WellKnownChain.westend2)
+      const provider = new ScProvider( Sc, Sc.WellKnownChain.polkadot)
       await provider.connect()
 
       const api = await ApiPromise.create({ provider })
