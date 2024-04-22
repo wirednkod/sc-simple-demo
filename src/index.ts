@@ -5,6 +5,10 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import "regenerator-runtime/runtime"
 import UI, { emojis } from "./view"
+import {
+  ScProvider,
+} from "@polkadot/rpc-provider"
+import * as Sc from "@substrate/connect"
 import { ApiPromise, WsProvider } from "@polkadot/api"
 
 window.onload = () => {
@@ -13,7 +17,12 @@ window.onload = () => {
   ui.showSyncing()
   void (async () => {
     try {
-      const provider = new WsProvider("wss://rpc.polkadot.io")
+
+
+      // const provider = new WsProvider("wss://rpc.polkadot.io")
+      const provider = new ScProvider(Sc, Sc.WellKnownChain.polkadot)
+      await provider.connect()
+
       const api = await ApiPromise.create({ provider })
 
       const header = await api.rpc.chain.getHeader()
