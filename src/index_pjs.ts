@@ -15,7 +15,7 @@ window.onload = () => {
       const chainName = await api.rpc.system.chain()
 
       // Show chain constants - from chain spec
-      ui.log(`${emojis.seedling} client ready`, true)
+      ui.log(`${emojis.seedling} PJS is ready`, true)
       ui.log(
         `${emojis.info} Connected to ${chainName}: syncing will start at block #${header.number}`,
       )
