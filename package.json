@@ -42,8 +42,10 @@
     "webpack-dev-server": "^5.0.4"
   },
   "dependencies": {
+    "@polkadot-api/descriptors": "^0.0.1",
     "@polkadot/api": "10.13.1",
     "@polkadot/rpc-provider": "10.13.1",
-    "@substrate/connect": "0.8.10"
+    "@substrate/connect": "0.8.10",
+    "polkadot-api": "^0.3.0"
   }
 }
