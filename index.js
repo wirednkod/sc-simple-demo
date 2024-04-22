@@ -21,7 +21,7 @@ window.onload = () => {
             const runtime = await dotApi.runtime.latest();
             const latestHeader = await client.getBlockHeader();
             // // Show chain constants - from chain spec
-            ui.log(`${emojis.seedling} client ready`, true);
+            ui.log(`${emojis.seedling} PAPI is ready`, true);
             ui.log(`${emojis.info} Connected to ${name}: syncing will start at block #${latestHeader.number}`);
             // ui.log(
             //   `${emojis.chequeredFlag} Genesis hash is ${api.genesisHash.toHex()}`,

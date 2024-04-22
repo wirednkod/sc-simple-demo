@@ -12,7 +12,7 @@ window.onload = () => {
             const header = await api.rpc.chain.getHeader();
             const chainName = await api.rpc.system.chain();
             // Show chain constants - from chain spec
-            ui.log(`${emojis.seedling} client ready`, true);
+            ui.log(`${emojis.seedling} PJS is ready`, true);
             ui.log(`${emojis.info} Connected to ${chainName}: syncing will start at block #${header.number}`);
             ui.log(`${emojis.chequeredFlag} Genesis hash is ${api.genesisHash.toHex()}`);
             ui.log(`${emojis.banknote} ExistentialDeposit is ${api.consts.balances.existentialDeposit.toHuman()}`);
