@@ -1,13 +1,9 @@
 import "regenerator-runtime/runtime"
 import UI, { emojis } from "./view"
+import { ApiPromise, WsProvider } from "@polkadot/api"
 
-import { dot } from "@polkadot-api/descriptors";
-import { createClient } from "polkadot-api";
-import { getSmProvider } from "polkadot-api/sm-provider";
-import { chainSpec } from "polkadot-api/chains/polkadot";
-import { start } from "polkadot-api/smoldot";
-
-const { name } = JSON.parse(chainSpec)
+// import * as Sc from "@substrate/connect"
+// import { ScProvider } from "@polkadot/rpc-provider/substrate-connect"
 
 window.onload = () => {
   const loadTime = performance.now()
@@ -15,41 +11,64 @@ window.onload = () => {
   ui.showSyncing()
   void (async () => {
     try {
-      const smoldot = start();
-      const chain = await smoldot.addChain({ chainSpec });
+      const provider = new WsProvider("wss://rpc.polkadot.io")
 
-      const client = createClient(
-        getSmProvider(chain)
-      );
+      // const provider = new ScProvider(Sc, Sc.WellKnownChain.polkadot)
+      // await provider.connect()
 
-      // To interact with the chain, you need to get the `TypedApi`, which includes
-      // all the types for every call in that chain:
-      const dotApi = client.getTypedApi(dot);
-      const runtime = await dotApi.runtime.latest()
-      const latestHeader = await client.getBlockHeader()
+      const api = await ApiPromise.create({ provider })
 
-      // // Show chain constants - from chain spec
-      ui.log(`${emojis.seedling} PAPI is ready`, true)
+      const header = await api.rpc.chain.getHeader()
+      const chainName = await api.rpc.system.chain()
+
+      // Show chain constants - from chain spec
+      ui.log(`${emojis.seedling} PJS is ready`, true)
       ui.log(
-        `${emojis.info} Connected to ${name}: syncing will start at block #${latestHeader.number}`,
+        `${emojis.info} Connected to ${chainName}: syncing will start at block #${header.number}`,
       )
-
-      // ui.log(
-      //   `${emojis.chequeredFlag} Genesis hash is ${api.genesisHash.toHex()}`,
-      // )
+      ui.log(
+        `${emojis.chequeredFlag} Genesis hash is ${api.genesisHash.toHex()}`,
+      )
       ui.log(
         `${emojis.banknote
-        } ExistentialDeposit is ${dotApi.constants.Balances.ExistentialDeposit(runtime)}`
+        } ExistentialDeposit is ${api.consts.balances.existentialDeposit.toHuman()}`,
       )
 
-      ui.log(`${emojis.newspaper} Subscribing to new block headers`)
-      client.finalizedBlock$.subscribe((finalizedBlock: { number: any; hash: any; }) => {
-        ui.showSynced()
-        ui.log(
-          `${emojis.brick} New block #${finalizedBlock.number} has hash ${finalizedBlock.hash} `,
-        )
+      // Show how many peers we are syncing with
+      const health = await api.rpc.system.health()
+      const peers =
+        health.peers.toNumber() === 1 ? "1 peer" : `${health.peers} peers`
+      ui.log(`${emojis.stethoscope} Chain is syncing with ${peers}`)
+
+      // Check the state of syncing every 2s and update the syncing state message
+      //
+      // Resolves the first time the chain is fully synced so we can wait before
+      // adding subscriptions. Carries on pinging to keep the UI consistent
+      // in case syncing stops or starts.
+      const wait = (ms: number) =>
+        new Promise<void>((res) => {
+          setTimeout(res, ms)
+        })
+      const waitForChainToSync = async () => {
+        const health = await api.rpc.system.health()
+        if (health.isSyncing.eq(false)) {
+          ui.showSynced()
+        } else {
+          ui.showSyncing()
+          await wait(2000)
+          await waitForChainToSync()
+        }
       }
-      );
+
+      await waitForChainToSync()
+      ui.log(`${emojis.newspaper} Subscribing to new block headers`)
+      await api.rpc.chain.subscribeNewHeads(
+        (lastHeader: { number: unknown; hash: unknown }) => {
+          ui.log(
+            `${emojis.brick} New block #${lastHeader.number} has hash ${lastHeader.hash}`,
+          )
+        },
+      )
     } catch (error) {
       ui.error(<Error>error)
     }
